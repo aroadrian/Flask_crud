@@ -20,6 +20,8 @@ def get_db_connection():
 
 get_db_connection()
 
+#SELECT all data from the database
+
 @app.route('/', methods=['GET'])
 def get_book():
     conn = get_db_connection()
