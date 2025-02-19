@@ -1,6 +1,7 @@
 import os
 import psycopg2
 
+# Database connection
 def db_connection():
         conn = psycopg2.connect(
         host="localhost",
@@ -10,8 +11,11 @@ def db_connection():
         
         )
         cur = conn.cursor()
-
+        
+        # Delete table if exists
         cur.execute('DROP TABLE IF EXISTS books;')
+
+        # Create table
         cur.execute('CREATE TABLE books (id SERIAL PRIMARY KEY,'
                     'title VARCHAR(150) NOT NULL,'
                     'author VARCHAR(50) NOT NULL,'
@@ -20,7 +24,7 @@ def db_connection():
                     'date_added date DEFAULT CURRENT_TIMESTAMP);'
                     )
         
-
+    # Insert data
         cur.execute('INSERT INTO books (title, author, pages_num, review) VALUES (%s, %s, %s, %s)',
             ('The Catcher in the Rye', 'J.D. Salinger', 277, 'A great book!'))
         
