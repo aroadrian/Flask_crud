@@ -32,6 +32,7 @@ def get_book():
     conn.close()
     return books
 
+
 #POST data to the database
 
 @app.route("/books", methods=['POST'])
@@ -66,6 +67,7 @@ def post_book():
         return jsonify({"error": "Invalid JSON format"}), 400
     
 
+
 #GET data by ID from the database
   
 @app.route("/books/<int:id>", methods=['GET'])
@@ -97,6 +99,35 @@ def get_book_by_id(id):
         # Close the database connection
         cur.close()
         conn.close()
+
+
+#delete data by ID from the database
+
+@app.route("/books/delete_by_id/<int:id>", methods=['DELETE'])
+def delete_book_by_id(id):
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    try:
+        # Check if the book exists with the given ID
+        cur.execute('SELECT * FROM books WHERE id = %s;', (id,))
+        book = cur.fetchone()
+
+        if book is None:
+            return jsonify({"error": "Book not found with the given ID"}), 404
+
+        # If the book exists, delete it
+        cur.execute('DELETE FROM books WHERE id = %s;', (id,))
+        conn.commit()
+
+        return jsonify({"message": f"Book with ID {id} has been deleted successfully."}), 200
+
+    except Exception as e:
+        return jsonify({"error": f"Database error: {str(e)}"}), 500
+    finally:
+        cur.close()
+        conn.close()
+
 
 if __name__ == "__main__":
     app.run(debug=True)
