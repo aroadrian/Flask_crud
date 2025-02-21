@@ -32,6 +32,8 @@ def get_book():
     conn.close()
     return books
 
+#POST data to the database
+
 @app.route("/books", methods=['POST'])
 def post_book():
     # Check if request contains JSON
@@ -62,6 +64,39 @@ def post_book():
         return jsonify({"message": "Book added successfully"}), 201
     else:
         return jsonify({"error": "Invalid JSON format"}), 400
+    
+
+#GET data by ID from the database
+  
+@app.route("/books/<int:id>", methods=['GET'])
+def get_book_by_id(id):
+    # Create a database connection
+    conn = get_db_connection()
+    cur = conn.cursor()
+    
+    try:
+        # Execute the query to fetch the book by ID
+        cur.execute('SELECT * FROM books WHERE id = %s;', (id,))
+        book = cur.fetchone()
+
+        # If no book is found with the given ID, return an error
+        if book is None:
+            return jsonify({"error": "Book not found"}), 404
+        
+        # If book is found, return it in a JSON response
+        return jsonify({
+            "id": book[0],  # Assuming the first column is the ID
+            "title": book[1],
+            "author": book[2],
+            "pages_num": book[3],
+            "review": book[4]
+        }), 200
+    except Exception as e:
+        return jsonify({"error": f"Database error: {str(e)}"}), 500
+    finally:
+        # Close the database connection
+        cur.close()
+        conn.close()
 
 if __name__ == "__main__":
     app.run(debug=True)
